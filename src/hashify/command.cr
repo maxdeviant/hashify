@@ -1,11 +1,14 @@
 require "option_parser"
+require "crypto/md5"
 
 module Hashify
     module Command
         def self.run()
+            # TODO: Use something less type-crazy
             options = {
                 :function => "md5",
-                :recurse => false
+                :recurse => false,
+                :files => [] of String
             }
 
             OptionParser.new do |opts|
@@ -26,25 +29,31 @@ module Hashify
                 end
 
                 opts.unknown_args do |args, after_dash|
-                    options[:directory] = fetch_required_parameter(opts, args, "DIR")
+                    options[:files] = args
                 end
             end.parse!
 
             run(options)
         end
 
-        private def self.fetch_required_parameter(opts, args, name)
-            if args.empty?
-                puts "#{name} is missing"
-                puts opts
-                exit 1
-            end
+        private def self.run(options)
+            files = options[:files] as Array(String)
 
-            args.shift
+            files = files.select { |e| File.file?(e) }
+
+            files.each do |file|
+                directory = File.dirname(file)
+                extension = File.extname(file)
+                hash = hash(file)
+
+                File.rename(file, File.join(directory, "#{hash}#{extension}"))
+            end
         end
 
-        private def self.run(options)
-            puts options
+        private def self.hash(filename)
+            contents = File.read(filename)
+
+            Crypto::MD5.hex_digest(contents)
         end
     end
 end
