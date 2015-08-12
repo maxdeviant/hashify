@@ -1,0 +1,8 @@
+#
+# Crystal
+#
+
+/.deps/
+/libs/
+/.crystal/
+/doc/
