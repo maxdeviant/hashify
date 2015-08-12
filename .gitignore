@@ -6,3 +6,5 @@
 /libs/
 /.crystal/
 /doc/
+
+bin/
