@@ -42,6 +42,7 @@ module Hashify
                 end
 
                 opts.unknown_args do |args, after_dash|
+                    ARGF.each_line { |line| args << line.strip }
                     options.files = args
                 end
             end.parse!
